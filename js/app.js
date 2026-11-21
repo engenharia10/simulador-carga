@@ -255,7 +255,7 @@
   }
 
   /* ---------------------------------------------- comando rápido: mover / redimensionar */
-  const QP_KEY = 'simuladorCarga.quickPanel';
+  const QP_KEY = 'simuladorCarga.quickPanel.v2';
   const qp = { x: null, y: null, s: 1 };
 
   function quickApply() {

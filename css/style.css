@@ -24,7 +24,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--fd);
-  overflow: hidden;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 button { font: inherit; color: inherit; }
@@ -81,8 +81,13 @@ button { font: inherit; color: inherit; }
 .views button.on { background: var(--amber); color: #111; }
 
 /* ---------------------------------------------------------------- palco */
-.stage { position: absolute; top: 63px; left: 0; right: 0; bottom: 0; }
-.view-wrap { position: absolute; inset: 0; }
+/* cena 3D limpa no topo (só o Comando rápido sobre ela); painéis abaixo, lado a lado */
+.stage {
+  display: grid; gap: 12px; align-items: start;
+  grid-template-columns: minmax(300px, 1fr) minmax(320px, 1.15fr) minmax(300px, 1fr);
+  padding: 5px 0 20px;
+}
+.view-wrap { position: relative; grid-column: 1 / -1; height: calc(100vh - 150px); min-height: 420px; }
 #viewport { position: absolute; inset: 0; overflow: hidden; }
 #viewport canvas { display: block; }
 body.danger #viewport::after {
@@ -93,7 +98,7 @@ body.danger #viewport::after {
 @keyframes pulse { from { opacity: .45; } to { opacity: 1; } }
 
 .panel {
-  position: absolute;
+  position: relative;
   background: var(--panel);
   border: 1px solid var(--line);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -107,11 +112,9 @@ body.danger #viewport::after {
 @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
 
 /* ------------------------------------------------------------ comandos */
-.controls {
-  left: 12px; top: 14px; bottom: 12px; width: 320px;
-  overflow-y: auto; padding-bottom: 8px;
-  scrollbar-width: thin; scrollbar-color: #333a42 transparent;
-}
+.hud { grid-column: 1; grid-row: 2; margin-left: 12px; }
+.diagram { grid-column: 2; grid-row: 2; }
+.controls { grid-column: 3; grid-row: 2; margin-right: 12px; padding-bottom: 8px; }
 .controls::-webkit-scrollbar { width: 6px; }
 .controls::-webkit-scrollbar-thumb { background: #333a42; }
 
@@ -208,7 +211,7 @@ input[type=range]::-moz-range-thumb { width: 10px; height: 20px; border-radius: 
 .keylist span:first-child { display: flex; gap: 3px; }
 
 /* ------------------------------------------------------------------ HUD */
-.hud { right: 12px; top: 14px; width: 348px; padding: 14px 16px 14px; animation-delay: .08s; }
+.hud { padding: 14px 16px 14px; animation-delay: .08s; }
 .hud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 14px; }
 .ro label { display: block; font: 600 11px var(--fd); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
 .ro label small { font: 500 9px var(--fm); letter-spacing: .04em; color: var(--amber); text-transform: none; margin-left: 4px; }
@@ -239,7 +242,7 @@ input[type=range]::-moz-range-thumb { width: 10px; height: 20px; border-radius: 
 .flag.danger { color: var(--danger); border-color: rgba(255, 59, 48, .5); }
 
 /* ------------------------------------------------------------- diagrama */
-.diagram { right: 12px; bottom: 12px; width: 348px; height: 344px; display: flex; flex-direction: column; animation-delay: .16s; }
+.diagram { height: 360px; display: flex; flex-direction: column; animation-delay: .16s; }
 .diagram header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px; border-bottom: 1px solid var(--line);
@@ -255,7 +258,7 @@ input[type=range]::-moz-range-thumb { width: 10px; height: 20px; border-radius: 
 #chartImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
 
 /* ------------------------------------------------------ comando rápido */
-.quick { right: 372px; bottom: 12px; padding-bottom: 6px; animation-delay: .24s; --cut: 9px; }
+.quick { position: absolute; right: 12px; bottom: 12px; padding-bottom: 6px; animation-delay: .24s; --cut: 9px; }
 .quick::before { width: 30px; }
 .quick header {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -332,9 +335,9 @@ input[type=range]::-moz-range-thumb { width: 10px; height: 20px; border-radius: 
 
 /* --------------------------------------------------------------- alarme */
 .alarm {
-  position: absolute; top: 14px; left: calc(50% - 14px); transform: translateX(-50%);
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
   z-index: 4; display: flex; align-items: center; gap: 12px;
-  padding: 9px 20px 9px 12px; max-width: calc(100% - 740px);
+  padding: 9px 20px 9px 12px; max-width: calc(100% - 32px);
   font: 700 15px var(--fd); letter-spacing: .12em; text-transform: uppercase;
   color: #fff; background: var(--danger);
   box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
@@ -350,34 +353,26 @@ input[type=range]::-moz-range-thumb { width: 10px; height: 20px; border-radius: 
 .alarm[hidden] { display: none; }
 
 /* ----------------------------------------------------------- responsivo */
-@media (max-height: 800px) {
-  .diagram { height: 270px; }
-  .hud { padding: 10px 14px; }
-  .hud-grid { gap: 6px 12px; }
-  .ro.big output { font-size: 24px; }
-}
 @media (max-width: 1280px) {
   .model-desc { display: none; }
-  .controls { width: 296px; }
-  .quick { right: 342px; }
-  .hud, .diagram { width: 318px; }
-  .alarm { max-width: calc(100% - 660px); font-size: 13px; }
 }
-@media (max-width: 960px) {
-  body { overflow: auto; }
+@media (max-width: 1100px) {
+  .topbar { height: auto; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; }
+  .views { margin-left: auto; }
+  .stage { grid-template-columns: 1fr 1fr; }
+  .hud { grid-column: 1; grid-row: 2; }
+  .diagram { grid-column: 2; grid-row: 2; margin-right: 12px; }
+  .controls { grid-column: 1 / -1; grid-row: 3; margin: 0 12px; }
+}
+@media (max-width: 760px) {
   .topbar { height: auto; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; }
   .views { width: 100%; overflow-x: auto; }
   .views button { flex: 1; white-space: nowrap; }
-  .stage { position: static; display: flex; flex-direction: column; padding-bottom: 16px; }
-  body { overflow-x: hidden; }
-  .view-wrap { position: relative; height: 62vh; min-height: 340px; order: 0; }
-  .panel { position: relative; inset: auto; width: auto; margin: 10px 16px 0; }
-  .view-wrap .quick { position: absolute; right: 8px; bottom: 8px; margin: 0; width: auto; }
-  .view-wrap { min-height: 360px; }
-  .hud { order: 1; width: auto; }
-  .diagram { order: 2; width: auto; height: 300px; }
-  .controls { order: 3; width: auto; overflow: visible; }
-  .alarm { position: fixed; top: auto; bottom: 16px; left: 50%; max-width: calc(100% - 32px); }
+  .stage { grid-template-columns: 1fr; }
+  .view-wrap { height: 62vh; min-height: 360px; }
+  .hud, .diagram, .controls { grid-column: 1; grid-row: auto; margin: 0 12px; }
+  .diagram { height: 300px; }
+  .alarm { font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
